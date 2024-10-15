@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-import os
-from dotenv import load_dotenv
+import os # Para acessar as variaveis de ambiente
+from dotenv import load_dotenv #Para carregar as variáveis de ambiente
 
-load_dotenv()
+load_dotenv() #Carregamento das variáveis de ambiente
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_async_engine(DATABASE_URL, echo=True)

@@ -1,7 +1,7 @@
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import engine, Base, SessionLocal
 from schemas import Usuario_Schema
@@ -37,9 +37,34 @@ async def get_db():
         await db.close()
 
 
-@app.get("/rota-protegida")
-async def rota_protegida(token: str = Depends(verify_token)):
-    return "Rota protegida com sucesso"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+
+    credentials_exception = HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail= "Credenciais inválidas")
+
+
+    try:
+        payload = verify_token(token)
+        email_usuario: str = payload.get("sub")
+
+        if email_usuario is None:
+            raise credentials_exception
+        usuario_select = await db.execute(select(Usuario).where(Usuario.email_usuario == email_usuario))
+        usuario = usuario_select.scalar()
+        if usuario is None:
+            raise credentials_exception
+        return usuario
+    except Exception:
+        raise credentials_exception
+    
+
+
+
+
+@app.get("/rota-protegida", response_model= None)
+async def rota_protegida(current_user = Depends(get_current_user)):
+    return {"resposta" : f"{current_user.nome_usuario}"}
 
 @app.post("/cadastro", status_code= status.HTTP_201_CREATED)
 async def cadastrar_usuario(usuario: Usuario_Schema, db: AsyncSession = Depends(get_db) ):
