@@ -3,9 +3,9 @@ from sqlalchemy import select
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import engine, Base, SessionLocal
-from schemas import Usuario_Schema
-from models import Usuario
+from database.database import engine, Base, SessionLocal
+from models.schemas import Usuario_Schema
+from models.models_db import Usuario
 from fastapi.middleware.cors import CORSMiddleware
 from security.security import get_password_hash, verify_password, verify_token, create_access_token
 
