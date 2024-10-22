@@ -1,11 +1,11 @@
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import select
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import engine, Base, SessionLocal
-from models.schemas import Usuario_Schema
-from models.models_db import Usuario
+from models.schemas import Usuario_Schema, Login_Schema, Agendamento_Schema
+from models.models_db import Usuario, Agendamento
 from fastapi.middleware.cors import CORSMiddleware
 from security.security import get_password_hash, verify_password, verify_token, create_access_token
 
@@ -37,7 +37,7 @@ async def get_db():
         await db.close()
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
 
@@ -78,12 +78,12 @@ async def cadastrar_usuario(usuario: Usuario_Schema, db: AsyncSession = Depends(
     return "Teste"
     
 @app.post("/login", status_code= status.HTTP_202_ACCEPTED)
-async def login_usuario(email_usuario: str, senha: str, db: AsyncSession = Depends(get_db)):
-    usuario_select =  await db.execute(select(Usuario).where(Usuario.email_usuario == email_usuario))
+async def login_usuario(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    usuario_select =  await db.execute(select(Usuario).where(Usuario.email_usuario == form_data.username))
     usuario = usuario_select.scalar()
 
 
-    if not usuario or not verify_password(senha, usuario.senha):
+    if not usuario or not verify_password(form_data.password, usuario.senha):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario ou senha inválida",
@@ -96,7 +96,22 @@ async def login_usuario(email_usuario: str, senha: str, db: AsyncSession = Depen
 
 
 
+@app.post("/agendamento")
+async def agendamento(agendamento: Agendamento_Schema, usuario_logado: Usuario = Depends(get_current_user), db:AsyncSession = Depends(get_db)):
 
+    result = await db.execute(select(Usuario).where(Usuario.id == usuario_logado.id))
+    usuario = result.scalar()
+
+    novo_agendamento = Agendamento(
+        servico = agendamento.servico,
+        data = agendamento.data,
+        hora = agendamento.hora,
+        nome_usuario = usuario.nome_usuario
+    )
+
+    db.add(novo_agendamento)
+    await db.commit()
+    await db.refresh(novo_agendamento)
 
 
 
