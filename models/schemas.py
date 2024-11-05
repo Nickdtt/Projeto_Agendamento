@@ -18,3 +18,6 @@ class Agendamento_Schema(BaseModel):
     servico: str
     data: date
     hora: str
+
+class Criar_Servico_Schema(BaseModel):
+    nome_servico: str

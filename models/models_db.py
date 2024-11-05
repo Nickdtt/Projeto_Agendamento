@@ -24,3 +24,16 @@ class Agendamento(Base):
     nome_usuario = Column(ForeignKey("usuarios.nome_usuario"), nullable=False)
 
     usuario = relationship("Usuario", back_populates="agendamento")
+
+    class Config:
+        orm_mode = True
+
+
+class Servico(Base):
+    __tablename__= 'servicos'
+
+    id = Column(Integer, primary_key=True, unique=True)
+    nome = Column(String, index=True)
+
+    class Config:
+        orm_mode = True
