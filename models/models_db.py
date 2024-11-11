@@ -9,10 +9,12 @@ class Usuario(Base):
     id = Column(Integer, primary_key = True, autoincrement=True, index=True, unique=True)
     nome_usuario = Column(String, index=True, unique=True)
     email_usuario = Column(String, index=True)
-    senha = Column(String, index=True) 
+    senha = Column(String, index=True)
+    categoria = Column(String, index=True, default="usuario")
     
-    agendamento = relationship("Agendamento", back_populates="usuario")
+    agendamento = relationship("Agendamento", back_populates="usuario", cascade="all, delete-orphan")
 
+    
 
 class Agendamento(Base):
     __tablename__= 'agendamentos'

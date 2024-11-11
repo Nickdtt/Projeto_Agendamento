@@ -6,7 +6,12 @@ import os
 from dotenv import load_dotenv
 from typing import Optional
 import jwt
-
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException, status
+from database.database import get_db
+from models.models_db import Usuario
 
 
 
@@ -47,5 +52,24 @@ def verify_token(token: str):
     except jwt.InvalidTokenError:
         raise Exception("Token inválido")
 
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+
+    credentials_exception = HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail= "Credenciais inválidas")
+
+    try:
+        payload = verify_token(token)
+
+        email_usuario: str = payload.get("sub")
+        role: str = payload.get("role")
+        
+        if email_usuario is None or role is None:
+            raise credentials_exception
+        return {"email_usuario": email_usuario, "role": role}
+    except Exception:
+        raise credentials_exception
+    
 
 
