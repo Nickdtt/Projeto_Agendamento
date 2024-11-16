@@ -6,12 +6,10 @@ import os
 from dotenv import load_dotenv
 from typing import Optional
 import jwt
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy import select
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
 from database.database import get_db
-from models.models_db import Usuario
 
 
 
