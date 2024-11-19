@@ -1,6 +1,7 @@
-.env
+
 security/__pycache__/
 __pycache__
 .venv/
 *.pyc
 .venv/lib/python3.12/site-packages/__pycache__/
+.env
