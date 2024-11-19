@@ -5,9 +5,11 @@ from routes.users_routes import users_router
 from routes.security_routes import security_router
 from routes.admin_routes import admin_router
 from routes.services_routes import services_router
+from database.database import lifespan
+
+app = FastAPI(title="Projeto Agendamento", lifespan = lifespan)
 
 
-app = FastAPI(title="Projeto Agendamento")
 
 origins = [
     "http://localhost:5173",
