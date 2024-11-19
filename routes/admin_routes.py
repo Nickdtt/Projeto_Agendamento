@@ -15,7 +15,7 @@ async def rota_adm(current_adm = Depends(get_current_user), role: str = "adm"):
         raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail= "Credenciais inválidas")
 
 
-    return {"resposta" : f"{current_adm["email_usuario"]}"}
+    return {"resposta" : current_adm["email_usuario"]}
 
 @admin_router.get("/lista-agendamentos", response_model= None)
 async def lista_agendamentos_adm(current_adm = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
