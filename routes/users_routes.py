@@ -58,4 +58,4 @@ async def lista_agendamento_usuario(current_user = Depends(get_current_user), db
 
 @users_router.get("/rota-protegida", response_model= None)
 async def rota_protegida(current_user: dict = Depends(get_current_user)):
-    return {"resposta" : f"{current_user["email_usuario"]}"}
+    return {"resposta" : current_user["email_usuario"]}
