@@ -31,6 +31,10 @@ app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(services_router)
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 
 
 if __name__ == '__main__':
